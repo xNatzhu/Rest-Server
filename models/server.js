@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import router from "../routes/user.js";
+import dbConnection from "../db/config.js";
 
 
 class Server{
@@ -8,12 +9,21 @@ class Server{
         this.app = express();
         //En Node.js, los middlewares son funciones que se utilizan para procesar las solicitudes HTTP o las respuestas HTTP antes de que sean manejadas por la aplicación principal. 
         
+        //vamos a llamar la db en el conector.
+
+        this.conectarDb();
+
+
         this.usuarioPath = "/api/usuarios" //de esta manera sera mas facil gestionar los cambios y modificaciones de rutas.
         this.middlewares()
         this.routing()
         this.port = process.env.PORT || 3000;
         
 
+    }
+
+    async conectarDb(){
+        await dbConnection();
     }
 
     routing(){

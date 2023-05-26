@@ -1,3 +1,6 @@
+import Usuario from "../db/usuario.js"
+import bcryptjs from "bcryptjs"
+
 import { response } from "express"; //el response sirve para poder detectar el response generado por la condicional, es opcional es para ver las opciones que nos da el codificador asi podemos elegir sin equivocarnos
 
 /*
@@ -39,17 +42,38 @@ const usuariosGet = (req, resp =response)=>{
 
 
 //Sirve para enviar informacion.
-const usuariosPost = (req, resp =response)=>{
+const usuariosPost = async(req, resp =response)=>{
     //IMPORTANTE: El objeto "req" contiene información sobre la solicitud realizada por el cliente al servidor. 
 
-    const {nombre, apellido} = req.body //Aca la estamos diciendo que la informacion que nos estan enviando proviene del body.
-    //req ->
+    const body = req.body //Aca la estamos diciendo que la informacion que nos estan enviando proviene del body.
+
+
+    const creacionDeUsuario = await new Usuario(body) //el valor ingresado en el post se va almacenar en la configuracion de usuarios.
+
+
+    //Encriptacion de contraseña recibida del post -> encriptada a la bases de datos.
+
+    //paso 1 crear un salt
+
+    const encrypt = bcryptjs.genSaltSync(10) //va ser una encrypt donde vamos determinar el numeros de caracteres que tendran el encript nomrlamente se deja asi que seria 10 default
+
+    //paso 2 vincular el salta, con el dato recibido y encriptarlo.
+
+    creacionDeUsuario.Contrasena = bcryptjs.hashSync(body.Contrasena, encrypt) //esto va encriptando de una sola via
+
+    
+
+    creacionDeUsuario.save() // esto permite que el usuario añadido en el post se guarde en la base de datos.
+
+
+
+ 
     resp.json({
         msg:"Post api",
-        nombre,
-        apellido,
+        creacionDeUsuario
     })
 }
+
 
 
 //put sirve paa actualizar la informacion.
