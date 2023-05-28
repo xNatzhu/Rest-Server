@@ -77,13 +77,24 @@ const usuariosPost = async(req, resp =response)=>{
 
 
 //put sirve paa actualizar la informacion.
-const usuariosPut = (req, resp =response)=>{
+const usuariosPut = async(req, resp =response)=>{
 
     const { id } = req.params //esta es una propiedad que trae por defecto express para poder dar diferentes elementos que se agreguen despues del / por ejemplo en este caso diferentes ID.
 
+    const {Contrasena, google, correo, ...resto} = req.body
+
+    if(Contrasena){
+    const encrypt = bcryptjs.genSaltSync(10) 
+    resto.Contrasena = bcryptjs.hashSync(req.body.Contrasena, encrypt) 
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate(id, resto) // es un metodo que permite podes buscar el ID en la base de datos. y el segundo es la  informacion que va estar actualizando, 
+    
+    //[[[es decir este metodo busca el ID y una vez buscado actualiza la informacion.]]] find -> BUSCA / ById -> EL ID / And -> Y / Update -> ACTUALIZA
+
     resp.json({
         msg:"put api",
-        id
+        usuario
     })
 }
 
